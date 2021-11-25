@@ -1,0 +1,180 @@
+---
+title: "Lazy Learning - Knn"
+author: "Co Nhan"
+date: "11/23/2021"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+### In this short project, I intended to use lazy learning to detect cancer in the breast tissue. The dataset includes 569 examples of cancer biopsies, each with 32 features. The diagnosis is coded as "M" to indicate malignant or "B" to indicate benign.
+
+# Load Neccessary Package
+
+```{r}
+library("class")
+library("gmodels")
+```
+# Load Dataset - Breast Cancer Wisconsin dataset
+
+
+```{r setup, include=FALSE} 
+wbcd <- read.csv("./wisc_bc_data.csv", stringsAsFactors = FALSE)
+```
+
+## Checking data structure
+
+```{r}
+str(wbcd)
+```
+
+## Drop id feature
+
+```{r}
+wbcd <- wbcd[-1]
+```
+
+```{r}
+table(wbcd$diagnosis)
+```
+
+## Relabed "B" for Benign and "M" for Malignant
+
+```{r}
+wbcd$diagnosis <- factor(wbcd$diagnosis, levels = c("B", "M"), labels = c("Benign", "Malignant"))
+```
+
+## Proportion of Benign and Malignant in the dataset.
+
+```{r}
+round(prop.table(table(wbcd$diagnosis)) * 100, digits = 1)
+```
+
+
+## Getting an overview:
+
+```{r}
+summary(wbcd[c("radius_mean", "area_mean", "smoothness_mean")])
+```
+
+## Create normalize function
+
+```{r}
+normalize <- function(x){
+  return ((x - min(x)) / (max(x) - min(x)))
+}
+```
+
+
+## Normalize all the numeric data in the table
+
+```{r}
+wbcd_n <- as.data.frame(lapply(wbcd[2:31], normalize))
+```
+
+## Check if the normalization work correctly
+
+```{r}
+summary(wbcd_n$area_mean)
+```
+
+
+## SPliting data into training and testing dataset
+
+```{r}
+wbcd_train <- wbcd_n[1:469, ]
+wbcd_test <- wbcd_n[470:569, ]
+```
+
+## Creating label
+
+```{r}
+wbcd_train_labels <- wbcd[1:469, 1]
+wbcd_test_labels <- wbcd[470:569, 1]
+```
+
+#  Training a model on the data
+
+```{r}
+wbcd_test_pred <- knn(train = wbcd_train, test = wbcd_test,
+                      cl = wbcd_train_labels, k = 21)
+```
+
+## Predicting model Performance
+
+```{r}
+CrossTable(x = wbcd_test_labels, y = wbcd_test_pred,
+           prop.chisq = FALSE)
+```
+
+### The test result in a 98% accuracy. 2 out of 100 test samples are incorrectly labeled as Benign, when in fact, it is malignant (lower left).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
